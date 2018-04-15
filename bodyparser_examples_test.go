@@ -44,7 +44,7 @@ func ExampleNew() {
 	// Output: [test strings]
 }
 
-func ExampleGet_Body() {
+func ExampleGet_body() {
 	// Somewhere in bodyparser middleware
 	ctx := context.WithValue(nil, bodyparser.BodyKey, &map[string]string{})
 
@@ -54,7 +54,7 @@ func ExampleGet_Body() {
 	// Output: &map[] <nil>
 }
 
-func ExampleGet_Error() {
+func ExampleGet_error() {
 	// Somewhere in bodyparser middleware
 	ctx := context.WithValue(nil, bodyparser.BodyKey, errors.New("error"))
 
@@ -82,7 +82,7 @@ func ExampleGetError() {
 	// Output: error
 }
 
-func ExampleBodyParser_ProceedOnError_Body() {
+func ExampleBodyParser_ProceedOnError_body() {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		body, err := bodyparser.Get(r.Context())
 		fmt.Println(body, err)
@@ -104,7 +104,7 @@ func ExampleBodyParser_ProceedOnError_Body() {
 	// Output: &[slice] <nil>
 }
 
-func ExampleBodyParser_ProceedOnError_Error() {
+func ExampleBodyParser_ProceedOnError_error() {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		body, err := bodyparser.Get(r.Context())
 		fmt.Println(body, err)
@@ -157,4 +157,23 @@ func ExampleBodyParser_Handler() {
 
 	// Use Handler method of bodyparser struct as middleware
 	router.Use(parser.Handler)
+}
+
+func ExampleBodyParser_Handler_error() {
+	// Create bodyparser middleware for slice of strings
+	var parser = bodyparser.New(reflect.TypeOf([]string{}))
+
+	router := chi.NewRouter()
+	router.With(parser.Handler).Post("/api", nil)
+
+	bodyStr := "/invalid JSON/"
+	buffer := bytes.NewBufferString(bodyStr)
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "http://localhost/api", ioutil.NopCloser(buffer))
+
+	router.ServeHTTP(w, r)
+
+	fmt.Println(w.Body.String())
+	// Output: Bad Request
 }
