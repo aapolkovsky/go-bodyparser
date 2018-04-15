@@ -3,7 +3,6 @@ package bodyparser
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"reflect"
 )
@@ -85,8 +84,7 @@ func (bodyParser *BodyParser) Handler(next http.Handler) http.Handler {
 				return
 			}
 
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintln(w, "400 Bad Request")
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 
