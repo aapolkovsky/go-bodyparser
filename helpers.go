@@ -63,7 +63,7 @@ func NewOfType(bodyType reflect.Type) (interface{}, error) {
 		return nil, ErrInvalidType
 	}
 
-	// Put pointer to type of body for other types
+	// Put pointer to body
 	return reflect.New(bodyType).Interface(), nil
 }
 
